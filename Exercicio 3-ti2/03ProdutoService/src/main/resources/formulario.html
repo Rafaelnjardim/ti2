@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+<title>Controle de Estoque</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+    }
+
+    header, footer {
+        background-color: #2c3e50;
+        color: white;
+        padding: 15px 0;
+        text-align: center;
+    }
+
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        text-align: center;
+        color: #34495e;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+    }
+
+    .section--container__responsive {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 20px 0;
+        padding-bottom: 20px;
+        border-bottom: 1px dashed #ccc;
+    }
+
+    form {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin: 0 15px;
+        max-width: 350px;
+        width: 100%;
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    form:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    label {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    input[type="text"], input[type="submit"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-size: 1rem;
+        color: #333;
+        transition: all 0.2s ease-in-out;
+    }
+
+    input[type="text"]:focus {
+        border-color: #6200ea;
+        outline: none;
+        box-shadow: 0 0 5px rgba(98, 0, 234, 0.5);
+    }
+
+    input[type="submit"] {
+        background-color: #6200ea;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #3700b3;
+    }
+
+    .input--remove__style {
+        background-color: #e74c3c;
+    }
+
+    .input--remove__style:hover {
+        background-color: #c0392b;
+    }
+
+    .input--consult__style {
+        background-color: #03a9f4;
+    }
+
+    .input--consult__style:hover {
+        background-color: #0288d1;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f7f7f7;
+        color: #34495e;
+        font-weight: bold;
+    }
+
+    td {
+        background-color: #ffffff;
+        color: #2c3e50;
+    }
+
+    .hidden {
+        visibility: hidden;
+    }
+
+    /* Botão flutuante */
+    .floating-button {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background-color: #6200ea;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .floating-button:hover {
+        background-color: #3700b3;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+
+</style>
+
+<script type="text/javascript">
+    function addIdToPath(form_name, base_url) {
+        var your_form = document.getElementById(form_name);
+        var id = your_form.elements.namedItem("id").value;
+        action_src = base_url + id;
+        your_form.action = action_src;
+    }
+</script>
+
+</head>
+<body>
+
+    <header>
+        <h1>Controle de Estoque</h1>
+    </header>
+
+    <section class="section--container__responsive">
+        <section class="section--mainrow__responsive first--section">
+            <h2>Inserir Produto</h2>
+            <form class="form--register" action="http://localhost:6789/produto" method="post" id="form-add">
+                <label for="descricao">Descrição:</label>
+                <input type="text" name="descricao" placeholder="leite, pão...">
+
+                <label for="preco">Preço:</label>
+                <input type="text" name="preco" placeholder="Preço do produto">
+
+                <label for="quantidade">Quantidade:</label>
+                <input type="text" name="quantidade" placeholder="Quantidade">
+
+                <label for="dataFabricacao">Data de fabricação:</label>
+                <input type="text" name="dataFabricacao" placeholder="2020-04-16T12:00:00..."> 
+
+                <label for="dataValidade">Data de validade:</label>
+                <input type="text" name="dataValidade" placeholder="2020-04-16">
+
+                <input type="submit" value="Cadastrar" class="input--main__style input--button">
+            </form>
+        </section>
+    </section>
+
+    <section class="section--container__responsive">
+        <section>
+            <h2>Detalhar produto</h2>
+            <form onsubmit="addIdToPath('form-get', 'http://localhost:6789/produto/')" method="get" id="form-get">
+                <input type="text" id="id" name="id" placeholder="id do produto..."> 
+                <input type="submit" value="Consultar" class="input--button input--consult__style">
+            </form>
+        </section>
+        
+        <section>
+            <h2>Remover produto</h2>
+            <form onsubmit="addIdToPath('form-delete', 'http://localhost:6789/produto/delete/')" method="get" id="form-delete">
+                <input type="text" id="id" name="id" placeholder="id do produto...">
+                <input type="submit" value="Remover" class="input--button input--remove__style">
+            </form>
+        </section>
+
+        <section>
+            <h2>Listar produtos</h2>
+            <form action="http://localhost:6789/produto" method="get" id="form-all">
+                <input type="submit" value="Listar todos" class="input--button input--consult__style">
+            </form>
+        </section>
+    </section>
+
+    <section id="product-result" class="hidden">
+        <table>
+            <tr>
+                <th>Produto id:</th>
+                <td><span id="id">Sem Resultado</span></td>
+            </tr>
+            <tr>
+                <th>Descrição:</th>
+                <td><span id="descricao">Sem Resultado</span></td>
+            </tr>
+            <tr>
+                <th>Preço:</th>
+                <td><span id="preco">Sem Resultado</span></td>
+            </tr>
+            <tr>
+                <th>Quantidade:</th>
+                <td><span id="quant">Sem Resultado</span></td>
+            </tr>
+            <tr>
+                <th>Data de fabricação:</th>
+                <td><span id="dataFabricacao">Sem Resultado</span></td>
+            </tr>
+        </table>
+    </section>
+
+    <button class="floating-button">+</button>
+
+    <footer>
+        <p>&copy; 2024 Controle de Estoque. Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>
