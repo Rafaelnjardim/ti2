@@ -5,48 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Azure OCR - Extrair Texto da Imagem</title>
     <style>
+        /* Estilos gerais */
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            background-color: #f9f9f9;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
         }
 
+        /* Estilos do contêiner principal */
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Estilo do título */
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos do input de arquivo */
         input[type="file"] {
-            margin: 20px 0;
+            display: none;
         }
 
-        #result {
-            margin-top: 20px;
-            font-size: 16px;
-        }
-
-        button {
-            margin: 20px 0;
-            padding: 10px 20px;
+        /* Estilos do label para customizar o botão de upload */
+        label {
+            display: inline-block;
+            padding: 12px 25px;
             background-color: #4CAF50;
-            color: white;
-            border: none;
+            color: #ffffff;
+            border-radius: 5px;
             cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        label:hover {
+            background-color: #45a049;
+        }
+
+        /* Pré-visualização da imagem */
+        #preview {
+            display: block;
+            margin: 20px auto;
+            width: 250px;
+            height: 250px;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+            background-color: #f7f7f7;
+        }
+
+        /* Botão para extrair texto */
+        button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background-color 0.3s;
         }
 
         button:hover {
             background-color: #45a049;
         }
+
+        /* Resultado do OCR */
+        #result {
+            margin-top: 20px;
+            font-size: 16px;
+            text-align: left;
+            color: #333;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Azure OCR - Extrair Texto de Imagem</h1>
+    <div class="container">
+        <h1>Extrair Texto de Imagem</h1>
 
-    <input type="file" id="fileInput" accept="image/*">
-    <button onclick="uploadImage()">Extrair Texto</button>
+        <!-- Customização do botão de upload -->
+        <input type="file" id="fileInput" accept="image/*" onchange="showImagePreview()">
+        <label for="fileInput">Selecionar Imagem</label>
 
-    <div id="result"></div>
+        <!-- Pré-visualização da imagem selecionada -->
+        <img id="preview" alt="Pré-visualização da imagem selecionada">
+
+        <!-- Botão para extrair texto -->
+        <button onclick="uploadImage()">Extrair Texto</button>
+
+        <!-- Área de exibição do texto extraído -->
+        <div id="result"></div>
+    </div>
 
     <script>
         const subscriptionKey = "8O5LyeyUS7NWNcwfgRuT4Hsd0O32dzqrRVQOepd0itN60vuOHo94JQQJ99AKACYeBjFXJ3w3AAAFACOGAtHR";
         const endpoint = "https://vvvzzz.cognitiveservices.azure.com";
+
+        // Função para mostrar a pré-visualização da imagem selecionada
+        function showImagePreview() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const preview = document.getElementById('preview');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
 
         // Função que é chamada quando o usuário clica no botão para enviar a imagem
         async function uploadImage() {
