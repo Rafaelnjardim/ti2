@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure OCR - Extrair Texto da Imagem</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        input[type="file"] {
+            margin: 20px 0;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        button {
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Azure OCR - Extrair Texto de Imagem</h1>
+
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="uploadImage()">Extrair Texto</button>
+
+    <div id="result"></div>
+
+    <script>
+        const subscriptionKey = "8O5LyeyUS7NWNcwfgRuT4Hsd0O32dzqrRVQOepd0itN60vuOHo94JQQJ99AKACYeBjFXJ3w3AAAFACOGAtHR";
+        const endpoint = "https://vvvzzz.cognitiveservices.azure.com";
+
+        // Função que é chamada quando o usuário clica no botão para enviar a imagem
+        async function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            // Verifica se um arquivo foi selecionado
+            if (!file) {
+                alert("Por favor, selecione uma imagem.");
+                return;
+            }
+
+            // Lê o conteúdo da imagem
+            const imageData = await file.arrayBuffer();
+            
+            // Faz a requisição para o serviço de OCR do Azure
+            const analyzeUrl = `${endpoint}/vision/v3.2/read/analyze`;
+            const response = await fetch(analyzeUrl, {
+                method: 'POST',
+                headers: {
+                    'Ocp-Apim-Subscription-Key': subscriptionKey,
+                    'Content-Type': 'application/octet-stream'
+                },
+                body: imageData
+            });
+
+            if (!response.ok) {
+                document.getElementById('result').innerText = 'Erro ao iniciar a análise OCR.';
+                return;
+            }
+
+            const operationLocation = response.headers.get('Operation-Location');
+            if (!operationLocation) {
+                document.getElementById('result').innerText = 'Erro: Localização da Operação não encontrada.';
+                return;
+            }
+
+            // Verifica o status da operação de OCR
+            await checkOCRStatus(operationLocation);
+        }
+
+        // Função que verifica o status da operação OCR
+        async function checkOCRStatus(operationLocation) {
+            let status = 'running';
+            while (status === 'running') {
+                const statusResponse = await fetch(operationLocation, {
+                    method: 'GET',
+                    headers: {
+                        'Ocp-Apim-Subscription-Key': subscriptionKey
+                    }
+                });
+
+                if (!statusResponse.ok) {
+                    document.getElementById('result').innerText = 'Erro ao verificar o status da operação OCR.';
+                    return;
+                }
+
+                const statusData = await statusResponse.json();
+                status = statusData.status;
+
+                // Quando o status for "succeeded", exibe o texto extraído
+                if (status === 'succeeded') {
+                    const lines = statusData.analyzeResult.readResults[0].lines;
+                    displayText(lines);
+                    return;
+                } else if (status === 'failed') {
+                    document.getElementById('result').innerText = 'Falha na operação OCR.';
+                    return;
+                }
+
+                // Aguarda 1 segundo antes de tentar novamente
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+
+        // Função que exibe o texto extraído da imagem
+        function displayText(lines) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<h2>Texto Extraído:</h2>';
+            lines.forEach(line => {
+                resultDiv.innerHTML += `<p>${line.text}</p>`;
+            });
+        }
+    </script>
+</body>
+</html>
