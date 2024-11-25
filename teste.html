@@ -67,7 +67,7 @@
             background-color: #f7f7f7;
         }
 
-        /* Botão para extrair texto */
+        /* Botões */
         button {
             padding: 12px 25px;
             background-color: #4CAF50;
@@ -77,7 +77,7 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
-            margin-top: 10px;
+            margin: 10px 5px;
             transition: background-color 0.3s;
         }
 
@@ -85,12 +85,17 @@
             background-color: #45a049;
         }
 
-        /* Resultado do OCR */
-        #result {
+        /* Caixa de texto */
+        textarea {
+            width: 100%;
+            height: 150px;
             margin-top: 20px;
-            font-size: 16px;
-            text-align: left;
-            color: #333;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: 'Arial', sans-serif;
+            resize: none;
         }
     </style>
 </head>
@@ -109,15 +114,19 @@
         <!-- Botão para extrair texto -->
         <button onclick="uploadImage()">Extrair Texto</button>
 
-        <!-- Área de exibição do texto extraído -->
-        <div id="result"></div>
+        <!-- Botão para exibir texto -->
+        <button onclick="showText()">Exibir Texto</button>
+
+        <!-- Caixa de texto para o texto extraído -->
+        <textarea id="textOutput" placeholder="O texto extraído aparecerá aqui..." readonly></textarea>
     </div>
 
     <script>
         const subscriptionKey = "8O5LyeyUS7NWNcwfgRuT4Hsd0O32dzqrRVQOepd0itN60vuOHo94JQQJ99AKACYeBjFXJ3w3AAAFACOGAtHR";
         const endpoint = "https://vvvzzz.cognitiveservices.azure.com";
 
-        // Função para mostrar a pré-visualização da imagem selecionada
+        let extractedText = ""; // Variável para armazenar o texto extraído
+
         function showImagePreview() {
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
@@ -132,21 +141,17 @@
             }
         }
 
-        // Função que é chamada quando o usuário clica no botão para enviar a imagem
         async function uploadImage() {
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
             
-            // Verifica se um arquivo foi selecionado
             if (!file) {
                 alert("Por favor, selecione uma imagem.");
                 return;
             }
 
-            // Lê o conteúdo da imagem
             const imageData = await file.arrayBuffer();
             
-            // Faz a requisição para o serviço de OCR do Azure
             const analyzeUrl = `${endpoint}/vision/v3.2/read/analyze`;
             const response = await fetch(analyzeUrl, {
                 method: 'POST',
@@ -158,21 +163,19 @@
             });
 
             if (!response.ok) {
-                document.getElementById('result').innerText = 'Erro ao iniciar a análise OCR.';
+                alert('Erro ao iniciar a análise OCR.');
                 return;
             }
 
             const operationLocation = response.headers.get('Operation-Location');
             if (!operationLocation) {
-                document.getElementById('result').innerText = 'Erro: Localização da Operação não encontrada.';
+                alert('Erro: Localização da Operação não encontrada.');
                 return;
             }
 
-            // Verifica o status da operação de OCR
             await checkOCRStatus(operationLocation);
         }
 
-        // Função que verifica o status da operação OCR
         async function checkOCRStatus(operationLocation) {
             let status = 'running';
             while (status === 'running') {
@@ -184,35 +187,30 @@
                 });
 
                 if (!statusResponse.ok) {
-                    document.getElementById('result').innerText = 'Erro ao verificar o status da operação OCR.';
+                    alert('Erro ao verificar o status da operação OCR.');
                     return;
                 }
 
                 const statusData = await statusResponse.json();
                 status = statusData.status;
 
-                // Quando o status for "succeeded", exibe o texto extraído
                 if (status === 'succeeded') {
                     const lines = statusData.analyzeResult.readResults[0].lines;
-                    displayText(lines);
+                    extractedText = lines.map(line => line.text).join('\n'); // Armazena o texto extraído
+                    alert('Texto extraído com sucesso! Clique em "Exibir Texto" para visualizá-lo.');
                     return;
                 } else if (status === 'failed') {
-                    document.getElementById('result').innerText = 'Falha na operação OCR.';
+                    alert('Falha na operação OCR.');
                     return;
                 }
 
-                // Aguarda 1 segundo antes de tentar novamente
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
         }
 
-        // Função que exibe o texto extraído da imagem
-        function displayText(lines) {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<h2>Texto Extraído:</h2>';
-            lines.forEach(line => {
-                resultDiv.innerHTML += `<p>${line.text}</p>`;
-            });
+        function showText() {
+            const textOutput = document.getElementById('textOutput');
+            textOutput.value = extractedText || "Nenhum texto extraído ainda!";
         }
     </script>
 </body>
