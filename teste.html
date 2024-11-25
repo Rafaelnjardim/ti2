@@ -88,7 +88,7 @@
         /* Caixa de texto */
         textarea {
             width: 100%;
-            height: 150px;
+            height: 100px;
             margin-top: 20px;
             padding: 10px;
             border: 1px solid #ccc;
@@ -111,14 +111,16 @@
         <!-- Pré-visualização da imagem selecionada -->
         <img id="preview" alt="Pré-visualização da imagem selecionada">
 
-        <!-- Botão para extrair texto -->
+        <!-- Botões para ações -->
         <button onclick="uploadImage()">Extrair Texto</button>
-
-        <!-- Botão para exibir texto -->
-        <button onclick="showText()">Exibir Texto</button>
+        <button onclick="copyText()">Copiar Texto</button>
+        <button onclick="pasteText()">Colar Texto</button>
 
         <!-- Caixa de texto para o texto extraído -->
         <textarea id="textOutput" placeholder="O texto extraído aparecerá aqui..." readonly></textarea>
+        
+        <!-- Caixa de texto para colar o texto -->
+        <textarea id="textInput" placeholder="O texto colado aparecerá aqui..."></textarea>
     </div>
 
     <script>
@@ -197,7 +199,7 @@
                 if (status === 'succeeded') {
                     const lines = statusData.analyzeResult.readResults[0].lines;
                     extractedText = lines.map(line => line.text).join('\n'); // Armazena o texto extraído
-                    alert('Texto extraído com sucesso! Clique em "Exibir Texto" para visualizá-lo.');
+                    document.getElementById('textOutput').value = extractedText; // Exibe o texto automaticamente
                     return;
                 } else if (status === 'failed') {
                     alert('Falha na operação OCR.');
@@ -208,9 +210,26 @@
             }
         }
 
-        function showText() {
+        function copyText() {
             const textOutput = document.getElementById('textOutput');
-            textOutput.value = extractedText || "Nenhum texto extraído ainda!";
+            if (textOutput.value) {
+                navigator.clipboard.writeText(textOutput.value)
+                    .then(() => alert('Texto copiado para a área de transferência!'))
+                    .catch(() => alert('Erro ao copiar o texto.'));
+            } else {
+                alert('Nenhum texto disponível para copiar.');
+            }
+        }
+
+        function pasteText() {
+            const textInput = document.getElementById('textInput');
+            navigator.clipboard.readText()
+                .then(text => {
+                    textInput.value = text || "Nenhum texto na área de transferência!";
+                })
+                .catch(() => {
+                    alert('Erro ao colar o texto.');
+                });
         }
     </script>
 </body>
